@@ -3,46 +3,53 @@
 #include <Joystick.h>
 
 // Create the Joystick
-Joystick_ Joystick;
+Joystick_ joystick;
 
 // Constant that maps the phyical pin to the joystick button.
-const int pinToButtonMap = 2;
+const int pin_to_button_map = 2;
 
-void setup() {
-  Serial.begin(9600);
-  // Initialize Button Pins
-  pinMode(pinToButtonMap, INPUT_PULLUP);
+void setup()
+{
+	Serial.begin(115200);
+	// Initialize Button Pins
+	pinMode(pin_to_button_map, INPUT_PULLUP);
 
-  // Initialize Joystick Library
-  Joystick.begin();
+	// Initialize Joystick Library
+	joystick.begin();
 }
 
 // Last state of the button
-int lastButtonState = 0;
+int last_button_state = 0;
 
-void loop() {
-  // Read pin values
-  int currentButtonState = digitalRead(pinToButtonMap);
-  if (currentButtonState != lastButtonState)
-  {
-    Joystick.setButton(0, currentButtonState);
-    lastButtonState = currentButtonState;
-  }
+void loop()
+{
+	// Read pin values
+	const auto current_button_state = digitalRead(pin_to_button_map);
+	if (current_button_state != last_button_state)
+	{
+		joystick.setButton(0, current_button_state);
+		last_button_state = current_button_state;
+	}
 
-  if (Serial.available() > 0) {
-    char inChar = Serial.read();
-    Serial.println((String)"Input: " + inChar);
-    switch (inChar) {
-      case 'u':
-        // Release joystick button
-        Joystick.setButton(1, 0);
-        break;
-      case 'd':
-        // Press joystick button
-        Joystick.setButton(1, 1);
-        break;
-    }
-  }
+	if (Serial.available() > 0)
+	{
+		const char in_char = Serial.read();
+		Serial.println(static_cast<String>("Input: ") + in_char);
+		switch (in_char)
+		{
+		case 'u':
+			// Release joystick button
+			joystick.setButton(1, 0);
+			Serial.println("Setting Button 1 to released");
+			break;
+		case 'd':
+			// Press joystick button
+			joystick.setButton(1, 1);
+			Serial.println("Setting Button 1 to pressed");
+			break;
+		default: ;
+		}
+	}
 
-  delay(50);
+	delay(50);
 }

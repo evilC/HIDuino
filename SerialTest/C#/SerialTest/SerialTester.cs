@@ -21,7 +21,7 @@ namespace SerialTest
             }
             Console.WriteLine($"Found {arduinos.Count} arduinos.\nConnecting to first found Arduino: {arduinos[0].Name} on port {arduinos[0].Port}");
             Console.WriteLine("Esc to exit, any other key to send char to Arduino");
-            _serialPort = new SerialPort(arduinos[0].Port, 9600, Parity.None);
+            _serialPort = new SerialPort(arduinos[0].Port, 115200) {DtrEnable = true};
             _serialPort.DataReceived += sp_DataReceived;
             _serialPort.Open();
             while (true)
@@ -35,15 +35,18 @@ namespace SerialTest
             }
         }
 
-        // ToDo: Never seems to get any data
         private void sp_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            var data = _serialPort.ReadLine();
-            Console.WriteLine($"Data Received: {data}");
+            Console.WriteLine();
+            while (_serialPort.BytesToRead != 0)
+            {
+                var data = _serialPort.ReadLine();
+                Console.WriteLine($"Data Received: {data}");
+            }
         }
 
         // https://stackoverflow.com/questions/3293889/how-to-auto-detect-arduino-com-port
-        private List<ArduinoDescriptor> AutodetectArduinoPort()
+        private static List<ArduinoDescriptor> AutodetectArduinoPort()
         {
             var arduinos = new List<ArduinoDescriptor>();
             var connectionScope = new ManagementScope();
